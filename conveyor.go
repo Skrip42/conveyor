@@ -1,28 +1,19 @@
 package conveyor
 
-import "context"
+import (
+	"github.com/Skrip42/conveyor/internal/module/processor"
+	"github.com/Skrip42/conveyor/internal/module/source"
+	"github.com/Skrip42/conveyor/internal/module/storage"
+)
 
-type Controller[V any] interface {
-	Run(context.Context) error
-	extend() worker[V]
+func NewSource[V any](adapter source.SourceAdapter[V]) Controller[V] {
+	return &controller[V]{worker: source.NewSource(adapter)}
 }
 
-type controller[V any] struct {
-	worker worker[V]
+func NewStorage[V any](base Controller[V], adapter storage.StorageAdapter[V]) Controller[V] {
+	return &controller[V]{worker: storage.NewStorage(base.extend(), adapter)}
 }
 
-func (c *controller[V]) extend() worker[V] {
-	return c.worker
-}
-
-func (c *controller[V]) Run(ctx context.Context) error {
-	output := c.worker.Run(ctx)
-
-	for item := range output {
-		if item.err != nil {
-			return item.err
-		}
-	}
-
-	return ctx.Err()
+func NewProcessor[I, O any](base Controller[I], adapter processor.ProcessorAdater[I, O]) Controller[O] {
+	return &controller[O]{worker: processor.NewProcessor(base.extend(), adapter)}
 }
