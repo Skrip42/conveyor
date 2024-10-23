@@ -8,19 +8,19 @@ import (
 
 type Controller[V any] interface {
 	Run(context.Context) error
-	extend() worker.Worker[V]
+	worker() worker.Worker[V]
 }
 
 type controller[V any] struct {
-	worker worker.Worker[V]
+	base worker.Worker[V]
 }
 
-func (c *controller[V]) extend() worker.Worker[V] {
-	return c.worker
+func (c *controller[V]) worker() worker.Worker[V] {
+	return c.base
 }
 
 func (c *controller[V]) Run(ctx context.Context) error {
-	output := c.worker.Run(ctx)
+	output := c.base.Run(ctx)
 
 	for item := range output {
 		if item.Err != nil {
