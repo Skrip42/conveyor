@@ -32,6 +32,7 @@ func (b *batchModule[I, O]) Run(ctx context.Context) <-chan item.Item[O] {
 	bufferOutput, bufferFlush := b.bufferfactory(runCtx, bufferInput)
 
 	go func() {
+		defer close(bufferInput)
 		for {
 			select {
 			case inputItem, ok := <-input:
