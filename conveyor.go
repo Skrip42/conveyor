@@ -1,29 +1,10 @@
 package conveyor
 
 import (
-	"context"
-
 	bufferfactory "github.com/Skrip42/conveyor/internal/buffer_factory"
 	"github.com/Skrip42/conveyor/internal/module"
 	"github.com/Skrip42/conveyor/internal/module/source"
-	"github.com/Skrip42/conveyor/internal/worker"
 )
-
-type conveyor[V any] struct {
-	worker worker.Worker[V]
-}
-
-func (c *conveyor[V]) Run(ctx context.Context) error {
-	output := c.worker.Run(ctx)
-
-	for item := range output {
-		if item.Err != nil {
-			return item.Err
-		}
-	}
-
-	return ctx.Err()
-}
 
 func NewSource[V any](adapter source.SourceAdapter[V]) Controller[V] {
 	return &controller[V]{base: source.NewSource(adapter)}
