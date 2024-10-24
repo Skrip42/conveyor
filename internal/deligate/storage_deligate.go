@@ -1,6 +1,10 @@
-package module
+package deligate
 
-import "context"
+import (
+	"context"
+
+	"github.com/Skrip42/conveyor/deligate"
+)
 
 type StorageAdapter[V any] func(context.Context, V) error
 
@@ -16,6 +20,6 @@ func (s *StorageDeligate[V]) Eval(
 	return data, true, err
 }
 
-func NewStorageDeligate[V any](adapter StorageAdapter[V]) Deligate[V, V] {
+func NewStorageDeligate[V any](adapter StorageAdapter[V]) deligate.Deligate[V, V] {
 	return &StorageDeligate[V]{adapter: adapter}
 }

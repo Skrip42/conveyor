@@ -3,7 +3,8 @@ package module
 import (
 	"context"
 
-	bufferfactory "github.com/Skrip42/conveyor/internal/buffer_factory"
+	bufferfactory "github.com/Skrip42/conveyor/buffer_factory"
+	"github.com/Skrip42/conveyor/deligate"
 	"github.com/Skrip42/conveyor/internal/item"
 	"github.com/Skrip42/conveyor/internal/worker"
 )
@@ -11,7 +12,7 @@ import (
 type batchModule[I, O any] struct {
 	base          worker.Worker[I]
 	bufferfactory bufferfactory.BufferFactory[I]
-	deligate      Deligate[[]I, []O]
+	deligate      deligate.Deligate[[]I, []O]
 }
 
 func (b *batchModule[I, O]) Run(ctx context.Context) <-chan item.Item[O] {
@@ -91,8 +92,8 @@ func (b *batchModule[I, O]) Run(ctx context.Context) <-chan item.Item[O] {
 
 func NewBatchModule[I, O any](
 	baseWorker worker.Worker[I],
+	deligate deligate.Deligate[[]I, []O],
 	bufferfactory bufferfactory.BufferFactory[I],
-	deligate Deligate[[]I, []O],
 ) worker.Worker[O] {
 	return &batchModule[I, O]{
 		base:          baseWorker,

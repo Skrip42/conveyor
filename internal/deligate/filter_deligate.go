@@ -1,6 +1,10 @@
-package module
+package deligate
 
-import "context"
+import (
+	"context"
+
+	"github.com/Skrip42/conveyor/deligate"
+)
 
 type FilterAdapter[V any] func(context.Context, V) (bool, error)
 
@@ -16,6 +20,6 @@ func (s *FilterDeligate[V]) Eval(
 	return data, isFiltered, err
 }
 
-func NewFilterDeligate[V any](adapter FilterAdapter[V]) Deligate[V, V] {
+func NewFilterDeligate[V any](adapter FilterAdapter[V]) deligate.Deligate[V, V] {
 	return &FilterDeligate[V]{adapter: adapter}
 }

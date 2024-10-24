@@ -1,6 +1,10 @@
-package module
+package deligate
 
-import "context"
+import (
+	"context"
+
+	"github.com/Skrip42/conveyor/deligate"
+)
 
 type ProcessorAdapter[I, O any] func(context.Context, I) (O, error)
 
@@ -16,6 +20,6 @@ func (s *ProcessorDeligate[I, O]) Eval(
 	return result, true, err
 }
 
-func NewProcessorDeligate[I, O any](adapter ProcessorAdapter[I, O]) Deligate[I, O] {
+func NewProcessorDeligate[I, O any](adapter ProcessorAdapter[I, O]) deligate.Deligate[I, O] {
 	return &ProcessorDeligate[I, O]{adapter: adapter}
 }

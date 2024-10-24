@@ -3,13 +3,14 @@ package module
 import (
 	"context"
 
+	"github.com/Skrip42/conveyor/deligate"
 	"github.com/Skrip42/conveyor/internal/item"
 	"github.com/Skrip42/conveyor/internal/worker"
 )
 
 type module[I, O any] struct {
 	base     worker.Worker[I]
-	deligate Deligate[I, O]
+	deligate deligate.Deligate[I, O]
 }
 
 func (b *module[I, O]) Run(ctx context.Context) <-chan item.Item[O] {
@@ -56,7 +57,7 @@ func (b *module[I, O]) Run(ctx context.Context) <-chan item.Item[O] {
 	return output
 }
 
-func NewModule[I, O any](baseWorker worker.Worker[I], deligate Deligate[I, O]) worker.Worker[O] {
+func NewModule[I, O any](baseWorker worker.Worker[I], deligate deligate.Deligate[I, O]) worker.Worker[O] {
 	return &module[I, O]{
 		base:     baseWorker,
 		deligate: deligate,

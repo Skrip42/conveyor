@@ -1,16 +1,15 @@
-package source
+package module
 
 import (
 	"context"
 	"io"
 
+	"github.com/Skrip42/conveyor/deligate"
 	"github.com/Skrip42/conveyor/internal/item"
 )
 
-type SourceAdapter[V any] func(context.Context, func(V)) error
-
 type source[V any] struct {
-	adapter SourceAdapter[V]
+	deligate deligate.SourceDeligate[V]
 }
 
 func (s *source[V]) Run(ctx context.Context) <-chan item.Item[V] {
@@ -25,7 +24,7 @@ func (s *source[V]) Run(ctx context.Context) <-chan item.Item[V] {
 
 	go func() {
 		defer close(output)
-		err := s.adapter(ctx, push)
+		err := s.deligate.Eval(ctx, push)
 		if err != nil {
 			if err == io.EOF {
 				return
@@ -40,6 +39,6 @@ func (s *source[V]) Run(ctx context.Context) <-chan item.Item[V] {
 	return output
 }
 
-func NewSource[V any](adapter SourceAdapter[V]) *source[V] {
-	return &source[V]{adapter: adapter}
+func NewSourceModule[V any](deligate deligate.SourceDeligate[V]) *source[V] {
+	return &source[V]{deligate: deligate}
 }

@@ -1,75 +1,41 @@
 package conveyor
 
 import (
-	bufferfactory "github.com/Skrip42/conveyor/internal/buffer_factory"
+	bufferfactory "github.com/Skrip42/conveyor/buffer_factory"
+	"github.com/Skrip42/conveyor/deligate"
 	"github.com/Skrip42/conveyor/internal/module"
-	"github.com/Skrip42/conveyor/internal/module/source"
 )
 
-func NewSource[V any](adapter source.SourceAdapter[V]) Controller[V] {
-	return &controller[V]{base: source.NewSource(adapter)}
-}
-
-func NewStorage[V any](
-	base Controller[V],
-	adapter module.StorageAdapter[V],
+func NewSource[V any](
+	deligate deligate.SourceDeligate[V],
 ) Controller[V] {
 	return &controller[V]{
-		base: module.NewModule(
-			base.worker(),
-			module.NewStorageDeligate(adapter),
-		),
+		base: module.NewSourceModule(deligate),
 	}
 }
 
-func NewBatchStorage[V any](
-	base Controller[V],
-	adapter module.StorageAdapter[[]V],
-	bufferfactory bufferfactory.BufferFactory[V],
-) Controller[V] {
-	return &controller[V]{
-		base: module.NewBatchModule(
-			base.worker(),
-			bufferfactory,
-			module.NewStorageDeligate(adapter),
-		),
-	}
-}
-
-func NewProcessor[I, O any](
+func NewModule[I, O any](
 	base Controller[I],
-	adapter module.ProcessorAdapter[I, O],
+	deligate deligate.Deligate[I, O],
 ) Controller[O] {
 	return &controller[O]{
 		base: module.NewModule(
 			base.worker(),
-			module.NewProcessorDeligate(adapter),
+			deligate,
 		),
 	}
 }
 
-func NewBatchProcessor[I, O any](
+func NewBatchModule[I, O any](
 	base Controller[I],
-	adapter module.ProcessorAdapter[[]I, []O],
+	deligate deligate.Deligate[[]I, []O],
 	bufferfactory bufferfactory.BufferFactory[I],
 ) Controller[O] {
 	return &controller[O]{
 		base: module.NewBatchModule(
 			base.worker(),
+			deligate,
 			bufferfactory,
-			module.NewProcessorDeligate(adapter),
-		),
-	}
-}
-
-func NewFilter[V any](
-	base Controller[V],
-	adapter module.FilterAdapter[V],
-) Controller[V] {
-	return &controller[V]{
-		base: module.NewModule(
-			base.worker(),
-			module.NewFilterDeligate(adapter),
 		),
 	}
 }
